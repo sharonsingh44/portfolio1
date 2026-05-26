@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mental Health Service Utilization — Sharon Singh</title>
+  <meta name="description" content="Predicting mental health service utilization in young adult men using Random Forest." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+
+  <header class="shell nav">
+    <a href="../index.html" class="nav__brand">Sharon Singh</a>
+    <nav class="nav__links">
+      <a href="../index.html#work" class="nav__link">Work</a>
+      <a href="../index.html#experience" class="nav__link">Experience</a>
+      <a href="../index.html#contact" class="nav__link">Contact</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+
+    <a href="../index.html" class="cs-back">← Back to portfolio</a>
+
+    <section class="cs-hero">
+      <p class="cs-hero__eyebrow">Case study iii · Healthcare research · Applied ML</p>
+      <h1 class="cs-hero__title">Predicting mental health service utilization in <em>young adult men</em></h1>
+      <p class="cs-hero__sub">Why does a vulnerable population avoid help — and can a model identify who's most likely to fall through the cracks? Led a three-person team through a project that started with a near-failing model and ended with a 30% AUC improvement and honest framing of what's still unsolved.</p>
+    </section>
+
+    <div class="cs-meta">
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Role</p>
+        <p class="cs-meta__value">Team lead</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Team size</p>
+        <p class="cs-meta__value">3 people</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Domain</p>
+        <p class="cs-meta__value">Public health</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">AUC lift</p>
+        <p class="cs-meta__value cs-meta__value--accent">+30%</p>
+      </div>
+    </div>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">The problem</h2>
+      <p>In 2021, only 40% of men with mental illness received treatment, compared to 52% of women. Young adult men aged 18–25 are one of the most underserved populations in mental health care — barriers include cultural norms, stigma, and structural access gaps. Public health interventions can only target what they can identify.</p>
+      <p>Our research question: <em>Among U.S. men aged 18–25 reporting mental health challenges, what demographic, socioeconomic, and geographic factors predict whether they utilize professional mental health services?</em></p>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Data &amp; approach</h2>
+      <p>Merged three public datasets from the Medical Expenditure Panel Survey (HC-244, HC-266, HC-277) using person ID as the join key. After filtering to U.S. men aged 18–25 reporting mental health challenges, we had a clean cohort with predictors spanning age, race, education, poverty category, total personal income, insurance coverage, and region.</p>
+      <div class="cs-callout">
+        <p class="cs-callout__label">Pipeline</p>
+        <p>Dataset merge (HC-244 + HC-266 + HC-277) → cohort filter → NA handling → feature engineering (age brackets, visit counts) → 75/25 stratified split → Random Forest regression → variable importance pruning → reframed target → Random Forest classification → ROC/AUC + confusion matrix</p>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">The work, in <em>two acts</em></h2>
+
+      <h3>Act i. The first model failed honestly</h3>
+      <p>I started by treating service utilization as a continuous outcome — modeling the <em>number</em> of mental health visits with a Random Forest regression. The variable importance plot identified total personal income, age, and education years as top predictors, which let us prune the noisier features and build a cleaner Model 1.</p>
+      <p>Model 1's AUC came back at <strong>0.5357</strong>. Barely above the 0.5 random-guess baseline.</p>
+      <p>A lot of teams would have buried this. We flagged it, diagnosed it, and treated it as the more interesting finding: the model couldn't distinguish service users from non-users because the target variable was wrong, the class imbalance was severe, and the regression framing was forcing the model to fit something noisier than it needed to.</p>
+
+      <h3>Act ii. The fix</h3>
+      <p>Three changes to Model 2:</p>
+      <ul>
+        <li><strong>Reframed the target</strong> from continuous visit count to a binary classification (used services: yes/no)</li>
+        <li><strong>Collapsed the perceived mental health score</strong> from 5 categories into 2 (good: 1–3, poor: 4–5) to reduce noise and concentrate signal</li>
+        <li><strong>Pruned the feature set</strong> using the importance plot from Model 1 — keeping only predictors that contributed to MSE reduction and node purity</li>
+      </ul>
+    </section>
+
+    <section class="cs-section">
+      <div class="cs-callout">
+        <p class="cs-callout__label">AUC progression</p>
+        <div class="cs-bar">
+          <div class="cs-bar__header">
+            <span class="cs-bar__label">Random baseline</span>
+            <span class="cs-bar__value">0.500</span>
+          </div>
+          <div class="cs-bar__track"><div class="cs-bar__fill" style="width: 50%"></div></div>
+        </div>
+        <div class="cs-bar">
+          <div class="cs-bar__header">
+            <span class="cs-bar__label">Model 1 — regression on visit count</span>
+            <span class="cs-bar__value">0.536</span>
+          </div>
+          <div class="cs-bar__track"><div class="cs-bar__fill" style="width: 53.6%"></div></div>
+        </div>
+        <div class="cs-bar cs-bar--accent">
+          <div class="cs-bar__header">
+            <span class="cs-bar__label">Model 2 — binary classification, pruned features</span>
+            <span class="cs-bar__value">0.697</span>
+          </div>
+          <div class="cs-bar__track"><div class="cs-bar__fill" style="width: 69.7%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">What the model found</h2>
+      <p>Total personal income, age, and education years were the strongest predictors of whether a young man with mental health challenges actually accessed care. Insurance coverage and poverty category also carried signal — pointing to access barriers that are structural, not just cultural.</p>
+      <p>For a public health team, the practical translation is that targeted outreach to low-income, lower-education segments — and ensuring insurance pathways are clear — would likely move the needle more than broad anti-stigma messaging alone.</p>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">What's still unsolved</h2>
+      <p>An AUC of 0.70 is a real improvement, but it is not a deployable model. The confusion matrix showed a class error of <strong>0.94 on the "Poor" health class</strong> — meaning the model was missing almost everyone we most needed to find. Honest next steps:</p>
+      <ul>
+        <li><strong>Apply SMOTE or class weighting</strong> to address the imbalance directly rather than working around it</li>
+        <li><strong>Optimize for recall on the minority class</strong>, not overall accuracy — a public health screening tool should over-flag, not under-flag</li>
+        <li><strong>Compare against XGBoost and gradient boosting variants</strong> with hyperparameter tuning, not just Random Forest</li>
+        <li><strong>Investigate the data itself.</strong> A 0.94 false negative rate suggests the signal may not be in this dataset at all — the next step might be richer features (geographic stigma proxies, social network data) rather than a better algorithm</li>
+      </ul>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Reflection</h2>
+      <p class="cs-pull">The honest takeaway wasn't the +30% AUC lift — it was the discipline of letting Model 1 fail visibly, diagnosing why, and writing the limitations of Model 2 with the same rigor as its results.</p>
+      <p>Real-world models on real-world social data rarely produce 95% accuracy. The work is in deciding when the model is good enough to inform a decision, and when it's still telling you to go back to the data.</p>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Tools</h2>
+      <div class="cs-tags">
+        <span>R</span>
+        <span>randomForest</span>
+        <span>MASS (LDA)</span>
+        <span>caret</span>
+        <span>pROC</span>
+        <span>tidymodels</span>
+        <span>MEPS data</span>
+      </div>
+    </section>
+
+  </main>
+
+  <section class="cs-footer">
+    <div class="shell">
+      <h2 class="cs-footer__title">Dig <em>deeper</em></h2>
+      <p class="cs-footer__sub">Code, full report, or just want to talk through the iteration? Reach out.</p>
+      <div class="cs-footer__actions">
+        <a href="#" class="btn btn--primary">View code on GitHub</a>
+        <a href="#" class="btn">Full report (PDF)</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="shell cs-nav">
+    <a href="customer-attrition.html">← Customer attrition</a>
+    <a href="data-governance.html">Data governance paper →</a>
+  </div>
+
+</body>
+</html>
