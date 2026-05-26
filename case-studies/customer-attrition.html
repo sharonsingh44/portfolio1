@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Attrition Prediction — Sharon Singh</title>
+  <meta name="description" content="Predicting customer attrition across a 10,000-account portfolio using XGBoost." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+
+  <header class="shell nav">
+    <a href="../index.html" class="nav__brand">Sharon Singh</a>
+    <nav class="nav__links">
+      <a href="../index.html#work" class="nav__link">Work</a>
+      <a href="../index.html#experience" class="nav__link">Experience</a>
+      <a href="../index.html#contact" class="nav__link">Contact</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+
+    <a href="../index.html" class="cs-back">← Back to portfolio</a>
+
+    <section class="cs-hero">
+      <p class="cs-hero__eyebrow">Case study 02 · Applied ML · Customer retention</p>
+      <h1 class="cs-hero__title">Predicting customer attrition across a 10,000-account portfolio</h1>
+      <p class="cs-hero__sub">Comparing five classifiers to flag at-risk customers before they churned — and turning the winning model's feature importances into a concrete retention playbook.</p>
+    </section>
+
+    <div class="cs-meta">
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Role</p>
+        <p class="cs-meta__value">Solo</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Stack</p>
+        <p class="cs-meta__value">R</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Models</p>
+        <p class="cs-meta__value">5 compared</p>
+      </div>
+      <div class="cs-meta__item">
+        <p class="cs-meta__label">Winner</p>
+        <p class="cs-meta__value cs-meta__value--accent">XGBoost</p>
+      </div>
+    </div>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">The problem</h2>
+      <p>A corporation needed to identify customers at high risk of leaving — and, just as importantly, understand <em>why</em> they were leaving. Attrition was draining revenue and degrading service reputation, but the existing process was reactive: customers were already gone by the time anyone noticed. The ask was twofold: build a model that could predict attrition probability, and surface the customer features that drove it so the business could act before churn happened.</p>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Data &amp; approach</h2>
+      <p>~10,000 customer records spanning demographics, account information, transaction history, and engagement signals. Target variable was Attrition_Flag (binary: existing vs. attrited).</p>
+      <div class="cs-callout">
+        <p class="cs-callout__label">Pipeline</p>
+        <p>Data cleansing → outlier handling (IQR + capping) → one-hot encoding → normalization → 80/20 train/test split → stratified sampling → 5-model comparison → hyperparameter tuning via cross-validation → ROC/AUC evaluation against a null baseline</p>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">The work</h2>
+      <p>I deliberately compared a range of model families rather than reaching straight for the most complex option — partly to confirm the simpler models couldn't do the job, and partly so the final write-up could explain <em>why</em> XGBoost was chosen, not just <em>that</em> it won.</p>
+
+      <table class="cs-table">
+        <thead>
+          <tr><th>Model</th><th>Accuracy</th><th>AUC</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Logistic Regression</td><td>90.96%</td><td>0.938</td></tr>
+          <tr><td>kNN (k=9)</td><td>91.80%</td><td>0.914</td></tr>
+          <tr><td>Naive Bayes</td><td>89.73%</td><td>0.899</td></tr>
+          <tr><td>Random Forest</td><td>95.26%</td><td>0.985</td></tr>
+          <tr class="winner"><td>XGBoost <span class="badge">winner</span></td><td>97.14%</td><td>0.991</td></tr>
+        </tbody>
+      </table>
+
+      <p>Logistic regression actually held up surprisingly well as a baseline — useful, because it meant the simpler interpretable model was already explaining most of the signal. The tree-based models (Random Forest and XGBoost) earned their complexity by handling the non-linear interactions and class imbalance more cleanly. The gap between train and test accuracy on XGBoost (0.99 vs. 0.97) suggested it was generalizing rather than memorizing.</p>
+
+      <p>The more interesting work was after the model selection. Once XGBoost was the winner, the feature importance plot told a story:</p>
+    </section>
+
+    <section class="cs-section">
+      <h3>Top drivers of attrition</h3>
+      <ul>
+        <li><strong>Total transaction count.</strong> Drops in transaction frequency were the strongest churn signal.</li>
+        <li><strong>Average open-to-buy ratio.</strong> Lower available credit correlated with higher attrition.</li>
+        <li><strong>Total transaction amount.</strong> Higher-spend customers were less likely to leave.</li>
+        <li><strong>Credit limit.</strong> Higher limits, lower churn risk.</li>
+        <li><strong>Gender.</strong> Male customers showed measurably different retention patterns.</li>
+      </ul>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Translating signal into action</h2>
+      <p>A 99% accuracy number is not useful on its own — what matters is whether the business can act on it. I closed the project by mapping each top feature to a concrete retention lever:</p>
+      <ul>
+        <li><strong>Declining transaction count</strong> → trigger a re-engagement campaign before the customer goes fully dormant</li>
+        <li><strong>Low open-to-buy ratio</strong> → proactively review for credit limit increases on eligible accounts</li>
+        <li><strong>High-spend customers</strong> → invest in loyalty programs that protect the most profitable segment</li>
+        <li><strong>Demographic patterns</strong> → run a controlled test on segment-specific messaging</li>
+        <li><strong>Resource allocation</strong> → score the book monthly and prioritize outreach by attrition probability, not gut feel</li>
+      </ul>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">What I'd do differently</h2>
+      <p>An AUC of 0.991 on a real-world business problem should always raise an eyebrow — including my own. A few things I would push harder on in a production version:</p>
+      <ul>
+        <li><strong>Audit for target leakage.</strong> Some predictors — like change in transaction count Q4 vs. Q1 — may carry post-churn information depending on how the snapshot was taken. I'd validate the timing of every feature against the churn event.</li>
+        <li><strong>Address class imbalance more rigorously.</strong> The attrited class was the minority. SMOTE or class weighting could change which model actually wins on the metric that matters (recall on churners, not overall accuracy).</li>
+        <li><strong>Optimize for the business metric, not accuracy.</strong> A false negative (missing a churner) costs more than a false positive (over-contacting a happy customer). I'd retrain optimizing for recall on the positive class and revisit the threshold.</li>
+        <li><strong>Validate on a holdout time window.</strong> An 80/20 random split is fine for coursework. In production, I'd train on months 1–9 and test on months 10–12 to confirm the model generalizes forward in time.</li>
+      </ul>
+    </section>
+
+    <section class="cs-section">
+      <h2 class="cs-section__title">Tools</h2>
+      <div class="cs-tags">
+        <span>R</span>
+        <span>xgboost</span>
+        <span>randomForest</span>
+        <span>caret</span>
+        <span>pROC</span>
+        <span>ggplot2</span>
+        <span>e1071</span>
+        <span>class</span>
+      </div>
+    </section>
+
+  </main>
+
+  <section class="cs-footer">
+    <div class="shell">
+      <h2 class="cs-footer__title">Dig deeper</h2>
+      <p class="cs-footer__sub">Code, full report, or just want to talk through the model choices? Reach out.</p>
+      <div class="cs-footer__actions">
+        <a href="#" class="btn btn--primary">View code on GitHub</a>
+        <a href="#" class="btn">Full report (PDF)</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="shell cs-nav">
+    <a href="oracle-health.html">← Oracle Health operations</a>
+    <a href="mental-health.html">Mental health utilization →</a>
+  </div>
+
+</body>
+</html>
